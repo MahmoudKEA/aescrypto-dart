@@ -26,7 +26,7 @@ String plainText = await cipher.decryptText(bytes: bytes);
 
 ### Encrypt & decrypt a file
 ```dart
-// Encrypto a file
+// Encrypt a file
 String outputPathEnc = await cipher.encryptFile(
     path: 'path/to/file.txt', // target file (Required)
     directory: 'output/folder', // putput dir (Default at same srcDir)
@@ -42,7 +42,7 @@ String outputPathDec = await cipher.decryptFile(path: 'path/to/file.txt.aes');
 
 ### Encrypt & decrypt between storage and memory
 ```dart
-// Encryp from memory to file
+// Encrypt from memory to file
 String outputPathToEnc = await cipher.encryptToFile(
     data: bytes,
     path: 'path/to/file.txt',
