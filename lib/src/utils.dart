@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:aescrypto/src/core/constants.dart';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as pathlib;
+
+import 'core/core.dart';
 
 Uint8List signatureAES = Uint8List.fromList("AESCrypto".codeUnits);
 

@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
-import 'package:aescrypto/src/core/constants.dart';
-import 'package:aescrypto/src/utils.dart';
 import 'package:encrypt/encrypt.dart';
+
+import '../utils.dart';
+import 'core.dart';
 
 Uint8List metadataBuilder(
   Uint8List key,

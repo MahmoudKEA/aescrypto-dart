@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:aescrypto/src/core/constants.dart';
+import 'core.dart';
 
 Uint8List sizePacked(int size, {bool reversed = true}) {
   ByteData bytedata = ByteData(packedLength)..setInt64(0, size);

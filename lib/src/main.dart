@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:aescrypto/src/core/core.dart';
-import 'package:aescrypto/src/utils.dart';
-import 'package:aescrypto/src/models.dart';
 import 'package:encrypt/encrypt.dart';
+
+import 'core/core.dart';
+import 'models.dart';
+import 'utils.dart';
 
 class AESCrypto {
   late Uint8List _key;

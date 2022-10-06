@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:aescrypto/src/core/constants.dart';
-import 'package:aescrypto/src/core/sizepack.dart';
-import 'package:aescrypto/src/core/metadata.dart';
-import 'package:aescrypto/src/core/progress_callback.dart';
-import 'package:aescrypto/src/models.dart';
-import 'package:aescrypto/src/utils.dart';
 import 'package:encrypt/encrypt.dart';
+
+import '../models.dart';
+import '../utils.dart';
+import 'core.dart';
 
 CipherModel getCipherModel(
   Uint8List key,

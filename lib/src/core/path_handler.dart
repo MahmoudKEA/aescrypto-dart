@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:aescrypto/src/core/constants.dart';
-import 'package:aescrypto/src/utils.dart';
 import 'package:path/path.dart' as pathlib;
+
+import '../utils.dart';
+import 'core.dart';
 
 void fileExistsChecker(String path, bool ignoreFileExists) {
   if (!ignoreFileExists && File(path).existsSync()) {
