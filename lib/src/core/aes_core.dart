@@ -15,11 +15,15 @@ CipherModel getCipherModel(
 }) {
   iv ??= IV.fromSecureRandom(16);
 
-  Encrypter cipher = Encrypter(AES(Key(key), mode: mode, padding: padding));
+  final Encrypter cipher = Encrypter(AES(
+    Key(key),
+    mode: mode,
+    padding: padding,
+  ));
   return CipherModel(cipher, iv);
 }
 
-void encryptFileCore(
+Future<void> encryptFileCore(
   Uint8List key,
   AESMode mode,
   ProgressState state,
@@ -27,16 +31,16 @@ void encryptFileCore(
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
   bool hasKey,
-) {
-  CipherModel cipher = getCipherModel(key, mode, padding: null);
+) async {
+  final CipherModel cipher = getCipherModel(key, mode, padding: null);
 
-  int size = srcFile.lengthSync();
-  outputFile.writeFromSync(sizePacked(size));
-  outputFile.writeFromSync(metadataBuilder(key, cipher.iv, true, hasKey));
+  final int size = await srcFile.length();
+  await outputFile.writeFrom(sizePacked(size));
+  await outputFile.writeFrom(metadataBuilder(key, cipher.iv, true, hasKey));
 
   while (state.isRunning) {
-    Uint8List chunk = srcFile.readSync(chunkSize);
-    int chunkLength = chunk.length;
+    Uint8List chunk = await srcFile.read(chunkSize);
+    final int chunkLength = chunk.length;
 
     if (chunkLength == 0) {
       state.stop();
@@ -46,23 +50,23 @@ void encryptFileCore(
       chunk = Uint8List.fromList(chunk + List.filled(padSize, padSize));
     }
 
-    outputFile.writeFromSync(
+    await outputFile.writeFrom(
       cipher.encrypter.encryptBytes(chunk.toList(), iv: cipher.iv).bytes,
     );
 
-    callback.updateSync(chunkLength, size);
+    await callback.update(chunkLength, size);
   }
 
-  outputFile.closeSync();
-  srcFile.closeSync();
+  await outputFile.close();
+  await srcFile.close();
 
   // Delete the output file if the process is killed
   if (state.isKilled && outputFile.path.isNotEmpty) {
-    File(outputFile.path).deleteSync();
+    await File(outputFile.path).delete();
   }
 }
 
-void decryptFileCore(
+Future<void> decryptFileCore(
   Uint8List key,
   AESMode mode,
   ProgressState state,
@@ -70,18 +74,18 @@ void decryptFileCore(
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
   bool hasKey,
-) {
-  int size = sizeUnpacked(srcFile.readSync(packedLength));
+) async {
+  final int size = sizeUnpacked(await srcFile.read(packedLength));
 
-  Uint8List metadata = srcFile.readSync(
+  final Uint8List metadata = await srcFile.read(
     signatureAES.length + (hasKey ? keyLength : 0) + ivLength,
   );
-  IV iv = metadataChecker(key, metadata.toList(), true, hasKey);
+  final IV iv = metadataChecker(key, metadata.toList(), true, hasKey);
 
-  CipherModel cipher = getCipherModel(key, mode, iv: iv, padding: null);
+  final CipherModel cipher = getCipherModel(key, mode, iv: iv, padding: null);
 
   while (state.isRunning) {
-    Uint8List chunk = srcFile.readSync(chunkSize);
+    Uint8List chunk = await srcFile.read(chunkSize);
     int chunkLength = chunk.length;
 
     if (chunkLength == 0) {
@@ -89,20 +93,20 @@ void decryptFileCore(
       continue;
     }
 
-    outputFile.writeFromSync(
+    await outputFile.writeFrom(
       cipher.encrypter.decryptBytes(Encrypted(chunk), iv: cipher.iv),
     );
 
-    callback.updateSync(chunkLength, size);
+    await callback.update(chunkLength, size);
   }
 
-  state.isCompleted ? outputFile.truncateSync(size) : null;
+  state.isCompleted ? await outputFile.truncate(size) : null;
 
-  outputFile.closeSync();
-  srcFile.closeSync();
+  await outputFile.close();
+  await srcFile.close();
 
   // Delete the output file if the process is killed
   if (state.isKilled && outputFile.path.isNotEmpty) {
-    File(outputFile.path).deleteSync();
+    await File(outputFile.path).delete();
   }
 }
