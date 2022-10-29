@@ -10,21 +10,15 @@ import 'core/core.dart';
 
 Uint8List signatureAES = Uint8List.fromList("AESCrypto".codeUnits);
 
-Future<String> fileChecksum(String path, {Hash algorithm = sha256}) {
-  return Future(() {
-    return fileChecksumSync(path, algorithm: algorithm);
-  });
-}
+Future<String> fileChecksum(String path, {Hash algorithm = sha256}) async {
+  final RandomAccessFile srcFile = await File(path).open(mode: FileMode.read);
 
-String fileChecksumSync(String path, {Hash algorithm = sha256}) {
-  RandomAccessFile srcFile = File(path).openSync(mode: FileMode.read);
-
-  AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
-  ByteConversionSink input = algorithm.startChunkedConversion(output);
+  final AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
+  final ByteConversionSink input = algorithm.startChunkedConversion(output);
 
   while (true) {
-    Uint8List chunk = srcFile.readSync(chunkSize);
-    int chunkLength = chunk.length;
+    final Uint8List chunk = await srcFile.read(chunkSize);
+    final int chunkLength = chunk.length;
     if (chunkLength == 0) {
       input.close();
       break;
@@ -36,48 +30,30 @@ String fileChecksumSync(String path, {Hash algorithm = sha256}) {
   return output.events.single.toString();
 }
 
-Future<String> getHashString(dynamic value, {Hash algorithm = sha256}) {
-  return Future(() {
-    return getHashStringSync(value, algorithm: algorithm);
-  });
-}
-
-String getHashStringSync(dynamic value, {Hash algorithm = sha256}) {
+String getHashString(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
     value = utf8.encode(value);
   }
   return algorithm.convert(value).toString();
 }
 
-Future<Uint8List> getHashDigest(dynamic value, {Hash algorithm = sha256}) {
-  return Future(() {
-    return getHashDigestSync(value, algorithm: algorithm);
-  });
-}
-
-Uint8List getHashDigestSync(dynamic value, {Hash algorithm = sha256}) {
+Uint8List getHashDigest(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
     value = utf8.encode(value);
   }
   return Uint8List.fromList(algorithm.convert(value).bytes);
 }
 
-Future<Uint8List> createKey(dynamic key) {
-  return Future(() {
-    return createKeySync(key);
-  });
+Uint8List createKey(dynamic key) {
+  final String key512 = getHashString(key, algorithm: sha512);
+  return getHashDigest(key512);
 }
 
-Uint8List createKeySync(dynamic key) {
-  String key512 = getHashStringSync(key, algorithm: sha512);
-  return getHashDigestSync(key512);
-}
-
-String addExtension(String path) {
+String addAESExtension(String path) {
   return pathlib.prettyUri(path + outputFileExtension);
 }
 
-String removeExtension(String path) {
+String removeAESExtension(String path) {
   return pathlib.prettyUri(
     path.endsWith(outputFileExtension)
         ? path.substring(0, path.length - outputFileExtension.length)

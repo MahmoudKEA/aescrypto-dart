@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
@@ -15,12 +16,12 @@ class AESCrypto {
   late ProgressCallback callback;
 
   AESCrypto({required String key, AESMode mode = AESMode.cbc}) {
-    _key = createKeySync(key);
+    _key = createKey(key);
     _mode = mode;
   }
 
   void setKey(String key) {
-    _key = createKeySync(key);
+    _key = createKey(key);
   }
 
   void setMode(AESMode mode) {
@@ -31,57 +32,56 @@ class AESCrypto {
     required String plainText,
     bool hasSignature = false,
     bool hasKey = false,
-  }) {
-    return Future(() {
-      return encryptTextSync(
-        plainText: plainText,
-        hasSignature: hasSignature,
-        hasKey: hasKey,
-      );
-    });
-  }
+  }) async {
+    final ReceivePort receivePort = ReceivePort();
 
-  Uint8List encryptTextSync({
-    required String plainText,
-    bool hasSignature = false,
-    bool hasKey = false,
-  }) {
-    CipherModel cipher = getCipherModel(_key, _mode);
-    Uint8List metadata = metadataBuilder(_key, cipher.iv, hasSignature, hasKey);
+    await Isolate.spawn<SendPort>(
+      (sendPort) {
+        final CipherModel cipher = getCipherModel(_key, _mode);
+        final Uint8List metadata = metadataBuilder(
+          _key,
+          cipher.iv,
+          hasSignature,
+          hasKey,
+        );
 
-    return Uint8List.fromList(
-      metadata + cipher.encrypter.encrypt(plainText, iv: cipher.iv).bytes,
+        final Uint8List cipherData = Uint8List.fromList(
+          metadata + cipher.encrypter.encrypt(plainText, iv: cipher.iv).bytes,
+        );
+
+        sendPort.send(cipherData);
+      },
+      receivePort.sendPort,
     );
+
+    return await receivePort.first;
   }
 
   Future<String> decryptText({
     required Uint8List bytes,
     bool hasSignature = false,
     bool hasKey = false,
-  }) {
-    return Future(() {
-      return decryptTextSync(
-        bytes: bytes,
-        hasSignature: hasSignature,
-        hasKey: hasKey,
-      );
-    });
-  }
+  }) async {
+    final ReceivePort receivePort = ReceivePort();
 
-  String decryptTextSync({
-    required Uint8List bytes,
-    bool hasSignature = false,
-    bool hasKey = false,
-  }) {
-    List<int> data = bytes.toList();
+    await Isolate.spawn<SendPort>(
+      (sendPort) {
+        final List<int> data = bytes.toList();
 
-    IV iv = metadataChecker(_key, data, hasSignature, hasKey);
-    CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
+        final IV iv = metadataChecker(_key, data, hasSignature, hasKey);
+        final CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
 
-    return cipher.encrypter.decrypt(
-      Encrypted(Uint8List.fromList(data)),
-      iv: cipher.iv,
+        final String textData = cipher.encrypter.decrypt(
+          Encrypted(Uint8List.fromList(data)),
+          iv: cipher.iv,
+        );
+
+        sendPort.send(textData);
+      },
+      receivePort.sendPort,
     );
+
+    return await receivePort.first;
   }
 
   Future<String> encryptFile({
@@ -91,44 +91,35 @@ class AESCrypto {
     bool ignoreFileExists = false,
     bool removeAfterComplete = false,
     void Function(int value)? progressCallback,
-  }) {
-    return Future(() {
-      return encryptFileSync(
-        path: path,
-        directory: directory,
-        hasKey: hasKey,
-        ignoreFileExists: ignoreFileExists,
-        removeAfterComplete: removeAfterComplete,
-        progressCallback: progressCallback,
-      );
-    });
-  }
-
-  String encryptFileSync({
-    required String path,
-    String? directory,
-    bool hasKey = true,
-    bool ignoreFileExists = false,
-    bool removeAfterComplete = false,
-    void Function(int value)? progressCallback,
-  }) {
-    String outputPath = outputPathHandler(path, directory: directory);
-    fileExistsChecker(outputPath, ignoreFileExists);
+  }) async {
+    final String outputPath = await outputPathHandler(
+      path,
+      directory: directory,
+    );
+    await fileExistsChecker(outputPath, ignoreFileExists);
 
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    RandomAccessFile srcFile = File(path).openSync(
+    final RandomAccessFile srcFile = await File(path).open(
       mode: FileMode.read,
     );
-    RandomAccessFile outputFile = File(outputPath).openSync(
+    final RandomAccessFile outputFile = await File(outputPath).open(
       mode: FileMode.writeOnly,
     );
 
-    encryptFileCore(_key, _mode, state, callback, srcFile, outputFile, hasKey);
+    await encryptFileCore(
+      _key,
+      _mode,
+      state,
+      callback,
+      srcFile,
+      outputFile,
+      hasKey,
+    );
 
     if (removeAfterComplete && state.isCompleted) {
-      File(srcFile.path).deleteSync();
+      await File(srcFile.path).delete();
     }
 
     return outputPath;
@@ -141,44 +132,35 @@ class AESCrypto {
     bool ignoreFileExists = false,
     bool removeAfterComplete = false,
     void Function(int value)? progressCallback,
-  }) {
-    return Future(() {
-      return decryptFileSync(
-        path: path,
-        directory: directory,
-        hasKey: hasKey,
-        ignoreFileExists: ignoreFileExists,
-        removeAfterComplete: removeAfterComplete,
-        progressCallback: progressCallback,
-      );
-    });
-  }
-
-  String decryptFileSync({
-    required String path,
-    String? directory,
-    bool hasKey = true,
-    bool ignoreFileExists = false,
-    bool removeAfterComplete = false,
-    void Function(int value)? progressCallback,
-  }) {
-    String outputPath = outputPathHandler(path, directory: directory);
-    fileExistsChecker(outputPath, ignoreFileExists);
+  }) async {
+    final String outputPath = await outputPathHandler(
+      path,
+      directory: directory,
+    );
+    await fileExistsChecker(outputPath, ignoreFileExists);
 
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    RandomAccessFile srcFile = File(path).openSync(
+    final RandomAccessFile srcFile = await File(path).open(
       mode: FileMode.read,
     );
-    RandomAccessFile outputFile = File(outputPath).openSync(
+    final RandomAccessFile outputFile = await File(outputPath).open(
       mode: FileMode.writeOnly,
     );
 
-    decryptFileCore(_key, _mode, state, callback, srcFile, outputFile, hasKey);
+    await decryptFileCore(
+      _key,
+      _mode,
+      state,
+      callback,
+      srcFile,
+      outputFile,
+      hasKey,
+    );
 
     if (removeAfterComplete && state.isCompleted) {
-      File(srcFile.path).deleteSync();
+      await File(srcFile.path).delete();
     }
 
     return outputPath;
@@ -190,37 +172,28 @@ class AESCrypto {
     bool hasKey = true,
     bool ignoreFileExists = false,
     void Function(int value)? progressCallback,
-  }) {
-    return Future(() {
-      return encryptToFileSync(
-        data: data,
-        path: path,
-        hasKey: hasKey,
-        ignoreFileExists: ignoreFileExists,
-        progressCallback: progressCallback,
-      );
-    });
-  }
-
-  String encryptToFileSync({
-    required Uint8List data,
-    required String path,
-    bool hasKey = true,
-    bool ignoreFileExists = false,
-    void Function(int value)? progressCallback,
-  }) {
-    String outputPath = outputPathHandler(path);
-    fileExistsChecker(outputPath, ignoreFileExists);
+  }) async {
+    final String outputPath = await outputPathHandler(path);
+    await fileExistsChecker(outputPath, ignoreFileExists);
 
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    RandomAccessFile srcFile = MemoryFileSystem()..writeFromSync(data);
-    RandomAccessFile outputFile = File(outputPath).openSync(
+    final RandomAccessFile srcFile = MemoryFileSystem();
+    await srcFile.writeFrom(data);
+    final RandomAccessFile outputFile = await File(outputPath).open(
       mode: FileMode.writeOnly,
     );
 
-    encryptFileCore(_key, _mode, state, callback, srcFile, outputFile, hasKey);
+    await encryptFileCore(
+      _key,
+      _mode,
+      state,
+      callback,
+      srcFile,
+      outputFile,
+      hasKey,
+    );
 
     return outputPath;
   }
@@ -229,33 +202,27 @@ class AESCrypto {
     required String path,
     bool hasKey = true,
     void Function(int value)? progressCallback,
-  }) {
-    return Future(() {
-      return decryptFromFileSync(
-        path: path,
-        hasKey: hasKey,
-        progressCallback: progressCallback,
-      );
-    });
-  }
-
-  Uint8List decryptFromFileSync({
-    required String path,
-    bool hasKey = true,
-    void Function(int value)? progressCallback,
-  }) {
+  }) async {
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    RandomAccessFile srcFile = File(path).openSync(
+    final RandomAccessFile srcFile = await File(path).open(
       mode: FileMode.read,
     );
-    RandomAccessFile outputFile = MemoryFileSystem();
+    final RandomAccessFile outputFile = MemoryFileSystem();
 
-    decryptFileCore(_key, _mode, state, callback, srcFile, outputFile, hasKey);
+    await decryptFileCore(
+      _key,
+      _mode,
+      state,
+      callback,
+      srcFile,
+      outputFile,
+      hasKey,
+    );
 
     // MemoryFileSystem still stores its data after closing it
     // inside decryptFileCore
-    return outputFile.readSync(outputFile.lengthSync());
+    return await outputFile.read(await outputFile.length());
   }
 }
