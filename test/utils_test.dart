@@ -7,7 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as pathlib;
 
-const debugging = false;
+const debugging = true;
 void printDebug(String message) {
   if (debugging) print(message);
 }
@@ -82,9 +82,9 @@ void main() {
       126
     ];
 
-    test("Test (getHashString) by string/bytes value", () async {
-      String resultByString = await getHashString(plainText);
-      String resultByBytes = await getHashString(textBytes);
+    test("Test (getHashString) by string/bytes value", () {
+      String resultByString = getHashString(plainText);
+      String resultByBytes = getHashString(textBytes);
 
       printDebug(
           """
@@ -96,9 +96,9 @@ void main() {
       expect(resultByString, equals(resultByBytes));
     });
 
-    test("Test (getHashBytes) by string/bytes value", () async {
-      Uint8List resultByString = await getHashDigest(plainText);
-      Uint8List resultByBytes = await getHashDigest(textBytes);
+    test("Test (getHashBytes) by string/bytes value", () {
+      Uint8List resultByString = getHashDigest(plainText);
+      Uint8List resultByBytes = getHashDigest(textBytes);
 
       printDebug(
           """
@@ -110,7 +110,7 @@ void main() {
       expect(resultByString, equals(resultByBytes));
     });
 
-    test("Test (createKey)", () async {
+    test("Test (createKey)", () {
       const String key = '123456';
       const List<int> hashKey = [
         10,
@@ -146,7 +146,7 @@ void main() {
         64,
         224
       ];
-      Uint8List result = await createKey(key);
+      Uint8List result = createKey(key);
 
       printDebug("""
       key: $key
@@ -160,9 +160,9 @@ void main() {
   group("Path Group:", () {
     String path = pathlib.prettyUri('./test/data.txt');
 
-    test("Test (addExtension & removeExtension)", () {
-      String resultWithExtension = addExtension(path);
-      String resultWithoutExtension = removeExtension(resultWithExtension);
+    test("Test (addAESExtension & removeAESExtension)", () {
+      String resultWithExtension = addAESExtension(path);
+      String resultWithoutExtension = removeAESExtension(resultWithExtension);
 
       printDebug(
           """
@@ -170,7 +170,7 @@ void main() {
       resultWithoutExtension: $resultWithoutExtension
       """);
 
-      expect(resultWithExtension, equals(path + '.aes'));
+      expect(resultWithExtension, equals('$path.aes'));
       expect(resultWithoutExtension, equals(path));
     });
   });

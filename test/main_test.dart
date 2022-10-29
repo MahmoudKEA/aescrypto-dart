@@ -6,7 +6,7 @@ import 'package:aescrypto/aescrypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:test/test.dart';
 
-const debugging = false;
+const debugging = true;
 void printDebug(String message) {
   if (debugging) print(message);
 }
@@ -114,8 +114,12 @@ void main() {
     Uint8List data = Uint8List.fromList(
       List<int>.generate(100016, (i) => random.nextInt(256)),
     );
-    File(path).writeAsBytesSync(data);
-    String checksum = fileChecksumSync(path);
+    late String checksum;
+
+    setUpAll(() async {
+      await File(path).writeAsBytes(data);
+      checksum = await fileChecksum(path);
+    });
 
     test("Test (encryptFile & decryptFile)", () async {
       String resultEncrypt = await cipher.encryptFile(
@@ -128,7 +132,7 @@ void main() {
         ignoreFileExists: true,
         progressCallback: (value) => printDebug('Decrypt progress: $value'),
       );
-      String fileDecryptChecksum = fileChecksumSync(resultdecrypt);
+      String fileDecryptChecksum = await fileChecksum(resultdecrypt);
 
       printDebug("""
       resultEncrypt: $resultEncrypt
@@ -150,7 +154,7 @@ void main() {
         path: resultEncrypt,
         progressCallback: (value) => printDebug('Decrypt progress: $value'),
       );
-      String fileDecryptChecksum = getHashStringSync(resultdecrypt);
+      String fileDecryptChecksum = getHashString(resultdecrypt);
 
       printDebug("""
       resultEncrypt: $resultEncrypt
