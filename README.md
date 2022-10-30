@@ -73,7 +73,7 @@ cipher.callback.value;
 signatureAES
 
 // Get sha256 of file
-fileChecksum(String path, {Hash algorithm = sha256});
+await fileChecksum(String path, {Hash algorithm = sha256});
 
 // Get sha256 of string/bytes
 getHashString(dynamic value, {Hash algorithm = sha256});
@@ -85,8 +85,8 @@ getHashDigest(dynamic value, {Hash algorithm = sha256});
 createKey(dynamic key);
 
 // Path with AES extension
-addExtension(String path);
+addAESExtension(String path);
 
 // Path without AES extension
-removeExtension(String path);
+removeAESExtension(String path);
 ```
