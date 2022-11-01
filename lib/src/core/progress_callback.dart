@@ -28,14 +28,7 @@ class ProgressCallback {
   int sizeProgressed = 0;
   int value = 0;
 
-  Future<ProgressCallback> update(int chunkSize, int size) {
-    return Future(() {
-      updateSync(chunkSize, size);
-      return this;
-    });
-  }
-
-  void updateSync(int chunkSize, int size) {
+  void update(int chunkSize, int size) {
     sizeProgressed += chunkSize;
     int currentValue = min((100.0 * sizeProgressed / size), 100.0).toInt();
 
