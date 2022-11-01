@@ -35,7 +35,7 @@ Future<void> encryptFileCore(
   final CipherModel cipher = getCipherModel(key, mode, padding: null);
 
   final int size = await srcFile.length();
-  await outputFile.writeFrom(sizePacked(size));
+  await outputFile.writeFrom(await sizePacked(size));
   await outputFile.writeFrom(metadataBuilder(key, cipher.iv, true, hasKey));
 
   while (state.isRunning) {
@@ -54,7 +54,7 @@ Future<void> encryptFileCore(
       cipher.encrypter.encryptBytes(chunk.toList(), iv: cipher.iv).bytes,
     );
 
-    await callback.update(chunkLength, size);
+    callback.update(chunkLength, size);
   }
 
   await outputFile.close();
@@ -75,7 +75,7 @@ Future<void> decryptFileCore(
   RandomAccessFile outputFile,
   bool hasKey,
 ) async {
-  final int size = sizeUnpacked(await srcFile.read(packedLength));
+  final int size = await sizeUnpacked(await srcFile.read(packedLength));
 
   final Uint8List metadata = await srcFile.read(
     signatureAES.length + (hasKey ? keyLength : 0) + ivLength,
@@ -97,7 +97,7 @@ Future<void> decryptFileCore(
       cipher.encrypter.decryptBytes(Encrypted(chunk), iv: cipher.iv),
     );
 
-    await callback.update(chunkLength, size);
+    callback.update(chunkLength, size);
   }
 
   state.isCompleted ? await outputFile.truncate(size) : null;

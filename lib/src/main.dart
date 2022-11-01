@@ -35,7 +35,7 @@ class AESCrypto {
   }) async {
     final ReceivePort receivePort = ReceivePort();
 
-    await Isolate.spawn<SendPort>(
+    Isolate.spawn<SendPort>(
       (sendPort) {
         final CipherModel cipher = getCipherModel(_key, _mode);
         final Uint8List metadata = metadataBuilder(
@@ -64,7 +64,7 @@ class AESCrypto {
   }) async {
     final ReceivePort receivePort = ReceivePort();
 
-    await Isolate.spawn<SendPort>(
+    Isolate.spawn<SendPort>(
       (sendPort) {
         final List<int> data = bytes.toList();
 
