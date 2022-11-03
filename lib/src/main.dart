@@ -33,18 +33,18 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) async {
+    final CipherModel cipher = getCipherModel(_key, _mode);
+    final Uint8List metadata = metadataBuilder(
+      _key,
+      cipher.iv,
+      hasSignature,
+      hasKey,
+    );
+
     final ReceivePort receivePort = ReceivePort();
 
     Isolate.spawn<SendPort>(
       (sendPort) {
-        final CipherModel cipher = getCipherModel(_key, _mode);
-        final Uint8List metadata = metadataBuilder(
-          _key,
-          cipher.iv,
-          hasSignature,
-          hasKey,
-        );
-
         final Uint8List cipherData = Uint8List.fromList(
           metadata + cipher.encrypter.encrypt(plainText, iv: cipher.iv).bytes,
         );
@@ -62,15 +62,15 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) async {
+    final List<int> data = bytes.toList();
+
+    final IV iv = metadataChecker(_key, data, hasSignature, hasKey);
+    final CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
+
     final ReceivePort receivePort = ReceivePort();
 
     Isolate.spawn<SendPort>(
       (sendPort) {
-        final List<int> data = bytes.toList();
-
-        final IV iv = metadataChecker(_key, data, hasSignature, hasKey);
-        final CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
-
         final String textData = cipher.encrypter.decrypt(
           Encrypted(Uint8List.fromList(data)),
           iv: cipher.iv,
