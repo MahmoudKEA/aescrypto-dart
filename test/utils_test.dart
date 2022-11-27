@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -14,7 +15,7 @@ void printDebug(String message) {
 
 void main() {
   const String plainText = "plainText";
-  final Uint8List textBytes = Uint8List.fromList("plainText".codeUnits);
+  final Uint8List textBytes = Uint8List.fromList(utf8.encode("plainText"));
 
   group("Checksum Group:", () {
     const String path = './test/data.txt';
@@ -86,8 +87,7 @@ void main() {
       String resultByString = getHashString(plainText);
       String resultByBytes = getHashString(textBytes);
 
-      printDebug(
-          """
+      printDebug("""
       resultByString: $resultByString
       resultByBytes: $resultByBytes
       """);
@@ -100,8 +100,7 @@ void main() {
       Uint8List resultByString = getHashDigest(plainText);
       Uint8List resultByBytes = getHashDigest(textBytes);
 
-      printDebug(
-          """
+      printDebug("""
       resultByString: $resultByString
       resultByBytes: $resultByBytes
       """);
@@ -164,8 +163,7 @@ void main() {
       String resultWithExtension = addAESExtension(path);
       String resultWithoutExtension = removeAESExtension(resultWithExtension);
 
-      printDebug(
-          """
+      printDebug("""
       resultWithExtension: $resultWithExtension
       resultWithoutExtension: $resultWithoutExtension
       """);

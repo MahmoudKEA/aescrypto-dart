@@ -8,7 +8,7 @@ import 'package:path/path.dart' as pathlib;
 
 import 'core/core.dart';
 
-Uint8List signatureAES = Uint8List.fromList("AESCrypto".codeUnits);
+Uint8List signatureAES = Uint8List.fromList(utf8.encode("AESCrypto"));
 
 Future<String> fileChecksum(String path, {Hash algorithm = sha256}) async {
   final RandomAccessFile srcFile = await File(path).open(mode: FileMode.read);
