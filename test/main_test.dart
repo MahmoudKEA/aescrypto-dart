@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:aescrypto/aescrypto.dart';
@@ -110,16 +109,9 @@ void main() {
 
   group("File Encryption Group:", () {
     const String path = './test/data.txt';
-    Random random = Random();
-    Uint8List data = Uint8List.fromList(
-      List<int>.generate(100016, (i) => random.nextInt(256)),
-    );
-    late String checksum;
-
-    setUpAll(() async {
-      await File(path).writeAsBytes(data);
-      checksum = await fileChecksum(path);
-    });
+    Uint8List data = File(path).readAsBytesSync();
+    const String checksum =
+        '93b9736fe1f6177e1932aa93e884119308a9259b8f29d8e8064110e544ce57f2';
 
     test("Test (encryptFile & decryptFile)", () async {
       String resultEncrypt = await cipher.encryptFile(

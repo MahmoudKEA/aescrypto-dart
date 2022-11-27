@@ -19,10 +19,6 @@ void main() {
 
   group("Checksum Group:", () {
     const String path = './test/data.txt';
-    Random random = Random();
-    File(path).writeAsBytesSync(
-      List<int>.generate(100016, (i) => random.nextInt(256)),
-    );
 
     test("Test (fileChecksum) in default sha256 algorithm", () async {
       String result = await fileChecksum(path);
@@ -31,7 +27,12 @@ void main() {
       result: $result
       """);
 
-      expect(result.length, equals(64));
+      expect(
+        result,
+        equals(
+          '93b9736fe1f6177e1932aa93e884119308a9259b8f29d8e8064110e544ce57f2',
+        ),
+      );
     });
 
     test("Test (fileChecksum) in MD5 algorithm", () async {
@@ -41,7 +42,7 @@ void main() {
       result: $result
       """);
 
-      expect(result.length, equals(32));
+      expect(result, equals('fb104f012a57130f2cd9d0870a614ab0'));
     });
   });
 
