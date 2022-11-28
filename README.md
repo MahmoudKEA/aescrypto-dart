@@ -18,10 +18,10 @@ cipher.setMode(AESMode.cbc);
 ### Encrypt & decrypt plain text
 ```dart
 // Encrypt text
-Uint8List bytes = await cipher.encryptText(plainText: 'plainText');
+Uint8List bytes = cipher.encryptText(plainText: 'plainText');
 
 // Decrypt text
-String plainText = await cipher.decryptText(bytes: bytes);
+String plainText = cipher.decryptText(bytes: bytes);
 ```
 
 ### Encrypt & decrypt a file
