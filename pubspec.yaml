@@ -1,6 +1,6 @@
 name: aescrypto
 description: Encrypt & Decrypt plain text and files with AES algorithm.
-version: 2.1.0
+version: 2.1.1
 homepage: https://github.com/MahmoudKhalid
 repository: https://github.com/MahmoudKhalid/aescrypto-dart
 issue_tracker: https://github.com/MahmoudKhalid/aescrypto-dart/issues
