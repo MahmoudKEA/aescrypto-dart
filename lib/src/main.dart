@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
@@ -28,11 +27,11 @@ class AESCrypto {
     _mode = mode;
   }
 
-  Future<Uint8List> encryptText({
+  Uint8List encryptText({
     required String plainText,
     bool hasSignature = false,
     bool hasKey = false,
-  }) async {
+  }) {
     final CipherModel cipher = getCipherModel(_key, _mode);
     final Uint8List metadata = metadataBuilder(
       _key,
@@ -41,47 +40,25 @@ class AESCrypto {
       hasKey,
     );
 
-    final ReceivePort receivePort = ReceivePort();
-
-    Isolate.spawn<SendPort>(
-      (sendPort) {
-        final Uint8List cipherData = Uint8List.fromList(
-          metadata + cipher.encrypter.encrypt(plainText, iv: cipher.iv).bytes,
-        );
-
-        sendPort.send(cipherData);
-      },
-      receivePort.sendPort,
+    return Uint8List.fromList(
+      metadata + cipher.encrypter.encrypt(plainText, iv: cipher.iv).bytes,
     );
-
-    return await receivePort.first;
   }
 
-  Future<String> decryptText({
+  String decryptText({
     required Uint8List bytes,
     bool hasSignature = false,
     bool hasKey = false,
-  }) async {
+  }) {
     final List<int> data = bytes.toList();
 
     final IV iv = metadataChecker(_key, data, hasSignature, hasKey);
     final CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
 
-    final ReceivePort receivePort = ReceivePort();
-
-    Isolate.spawn<SendPort>(
-      (sendPort) {
-        final String textData = cipher.encrypter.decrypt(
-          Encrypted(Uint8List.fromList(data)),
-          iv: cipher.iv,
-        );
-
-        sendPort.send(textData);
-      },
-      receivePort.sendPort,
+    return cipher.encrypter.decrypt(
+      Encrypted(Uint8List.fromList(data)),
+      iv: cipher.iv,
     );
-
-    return await receivePort.first;
   }
 
   Future<String> encryptFile({
