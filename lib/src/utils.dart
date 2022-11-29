@@ -44,9 +44,9 @@ Uint8List getHashDigest(dynamic value, {Hash algorithm = sha256}) {
   return Uint8List.fromList(algorithm.convert(value).bytes);
 }
 
-Uint8List createKey(dynamic key) {
-  final String key512 = getHashString(key, algorithm: sha512);
-  return getHashDigest(key512);
+Uint8List secureKey(dynamic key) {
+  final String key512 = getHashString(key, algorithm: sha256);
+  return getHashDigest(key512, algorithm: sha256);
 }
 
 String addAESExtension(String path) {

@@ -86,7 +86,8 @@ void main() {
       String resultByString = getHashString(plainText);
       String resultByBytes = getHashString(textBytes);
 
-      printDebug("""
+      printDebug(
+          """
       resultByString: $resultByString
       resultByBytes: $resultByBytes
       """);
@@ -99,7 +100,8 @@ void main() {
       Uint8List resultByString = getHashDigest(plainText);
       Uint8List resultByBytes = getHashDigest(textBytes);
 
-      printDebug("""
+      printDebug(
+          """
       resultByString: $resultByString
       resultByBytes: $resultByBytes
       """);
@@ -108,7 +110,7 @@ void main() {
       expect(resultByString, equals(resultByBytes));
     });
 
-    test("Test (createKey)", () {
+    test("Test (secureKey)", () {
       const String key = '123456';
       const List<int> hashKey = [
         10,
@@ -144,7 +146,7 @@ void main() {
         64,
         224
       ];
-      Uint8List result = createKey(key);
+      Uint8List result = secureKey(key);
 
       printDebug("""
       key: $key
@@ -162,7 +164,8 @@ void main() {
       String resultWithExtension = addAESExtension(path);
       String resultWithoutExtension = removeAESExtension(resultWithExtension);
 
-      printDebug("""
+      printDebug(
+          """
       resultWithExtension: $resultWithExtension
       resultWithoutExtension: $resultWithoutExtension
       """);

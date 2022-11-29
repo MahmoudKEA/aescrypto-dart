@@ -13,7 +13,7 @@ Uint8List metadataBuilder(
 ) {
   return Uint8List.fromList([
     if (hasSignature) ...signatureAES,
-    if (hasKey) ...createKey(key),
+    if (hasKey) ...secureKey(key),
     ...iv.bytes,
   ]);
 }
@@ -32,7 +32,7 @@ IV metadataChecker(
   }
 
   if (hasKey) {
-    if (data.take(keyLength).join() != createKey(key).join()) {
+    if (data.take(keyLength).join() != secureKey(key).join()) {
       throw Exception("the key doesn't match");
     }
     data.removeRange(0, keyLength);

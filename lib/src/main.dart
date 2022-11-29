@@ -15,12 +15,12 @@ class AESCrypto {
   late ProgressCallback callback;
 
   AESCrypto({required String key, AESMode mode = AESMode.cbc}) {
-    _key = createKey(key);
+    _key = secureKey(key);
     _mode = mode;
   }
 
   void setKey(String key) {
-    _key = createKey(key);
+    _key = secureKey(key);
   }
 
   void setMode(AESMode mode) {

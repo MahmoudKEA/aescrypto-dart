@@ -81,8 +81,8 @@ getHashString(dynamic value, {Hash algorithm = sha256});
 // Get sha256 digest of string/bytes
 getHashDigest(dynamic value, {Hash algorithm = sha256});
 
-// Create secret key of string/bytes
-createKey(dynamic key);
+// Create secure key of string/bytes
+secureKey(dynamic key);
 
 // Path with AES extension
 addAESExtension(String path);
