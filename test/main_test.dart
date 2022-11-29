@@ -118,7 +118,7 @@ void main() {
     const String path = './test/data.txt';
     Uint8List data = File(path).readAsBytesSync();
     const String checksum =
-        '93b9736fe1f6177e1932aa93e884119308a9259b8f29d8e8064110e544ce57f2';
+        'be4a441c9a46ecfcb89c55fcf9923997dc9282f72f716cc7680673a0f078195c';
 
     test("Test (encryptFile & decryptFile)", () async {
       String resultEncrypt = await cipher.encryptFile(
@@ -163,6 +163,7 @@ void main() {
       """);
 
       expect(resultdecrypt, equals(data));
+      expect(checksum, equals(fileDecryptChecksum));
     });
   });
 }
