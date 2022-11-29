@@ -82,9 +82,9 @@ void main() {
       126
     ];
 
-    test("Test (getHashString) by string/bytes value", () {
-      String resultByString = getHashString(plainText);
-      String resultByBytes = getHashString(textBytes);
+    test("Test (getTextChecksumString) by string/bytes value", () {
+      String resultByString = getTextChecksumString(plainText);
+      String resultByBytes = getTextChecksumString(textBytes);
 
       printDebug(
           """
@@ -97,8 +97,8 @@ void main() {
     });
 
     test("Test (getHashBytes) by string/bytes value", () {
-      Uint8List resultByString = getHashDigest(plainText);
-      Uint8List resultByBytes = getHashDigest(textBytes);
+      Uint8List resultByString = getTextChecksumBytes(plainText);
+      Uint8List resultByBytes = getTextChecksumBytes(textBytes);
 
       printDebug(
           """

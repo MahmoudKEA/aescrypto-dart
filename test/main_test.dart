@@ -146,7 +146,7 @@ void main() {
         path: resultEncrypt,
         progressCallback: (value) => printDebug('Decrypt progress: $value'),
       );
-      String fileDecryptChecksum = getHashString(resultdecrypt);
+      String fileDecryptChecksum = getTextChecksumString(resultdecrypt);
 
       printDebug("""
       resultEncrypt: $resultEncrypt

@@ -30,23 +30,33 @@ Future<String> fileChecksum(String path, {Hash algorithm = sha256}) async {
   return output.events.single.toString();
 }
 
-String getHashString(dynamic value, {Hash algorithm = sha256}) {
+String getTextChecksumString(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
     value = utf8.encode(value);
+  } else if (value is! List<int>) {
+    throw Exception(
+      "Value must be String or List<int>, got ${value.runtimeType}",
+    );
   }
+
   return algorithm.convert(value).toString();
 }
 
-Uint8List getHashDigest(dynamic value, {Hash algorithm = sha256}) {
+Uint8List getTextChecksumBytes(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
     value = utf8.encode(value);
+  } else if (value is! List<int>) {
+    throw Exception(
+      "Value must be String or List<int>, got ${value.runtimeType}",
+    );
   }
+
   return Uint8List.fromList(algorithm.convert(value).bytes);
 }
 
 Uint8List secureKey(dynamic key) {
-  final String key512 = getHashString(key, algorithm: sha256);
-  return getHashDigest(key512, algorithm: sha256);
+  final String key512 = getTextChecksumString(key, algorithm: sha256);
+  return getTextChecksumBytes(key512, algorithm: sha256);
 }
 
 String addAESExtension(String path) {
