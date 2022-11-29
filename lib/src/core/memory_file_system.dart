@@ -157,6 +157,7 @@ class MemoryFileSystem extends RandomAccessFile {
   void truncateSync(int length) {
     _accessibility();
     _dataBytes = _dataBytes.take(length).toList();
+    _length = length;
   }
 
   @override
