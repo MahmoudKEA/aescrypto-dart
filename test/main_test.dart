@@ -124,7 +124,7 @@ void main() {
         ignoreFileExists: true,
         progressCallback: (value) => printDebug('Decrypt progress: $value'),
       );
-      String fileDecryptChecksum = await fileChecksum(resultdecrypt);
+      String fileDecryptChecksum = await getFileChecksum(resultdecrypt);
 
       printDebug("""
       resultEncrypt: $resultEncrypt

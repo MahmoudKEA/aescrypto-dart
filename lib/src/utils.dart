@@ -10,7 +10,7 @@ import 'core/core.dart';
 
 Uint8List signatureAES = Uint8List.fromList(utf8.encode("AESCrypto"));
 
-Future<String> fileChecksum(String path, {Hash algorithm = sha256}) async {
+Future<String> getFileChecksum(String path, {Hash algorithm = sha256}) async {
   final RandomAccessFile srcFile = await File(path).open(mode: FileMode.read);
 
   final AccumulatorSink<Digest> output = AccumulatorSink<Digest>();

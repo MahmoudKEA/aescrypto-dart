@@ -18,8 +18,8 @@ void main() {
   group("Checksum Group:", () {
     const String path = './test/data.txt';
 
-    test("Test (fileChecksum) in default sha256 algorithm", () async {
-      String result = await fileChecksum(path);
+    test("Test (getFileChecksum) in default sha256 algorithm", () async {
+      String result = await getFileChecksum(path);
 
       printDebug("""
       result: $result
@@ -33,8 +33,8 @@ void main() {
       );
     });
 
-    test("Test (fileChecksum) in MD5 algorithm", () async {
-      String result = await fileChecksum(path, algorithm: md5);
+    test("Test (getFileChecksum) in MD5 algorithm", () async {
+      String result = await getFileChecksum(path, algorithm: md5);
 
       printDebug("""
       result: $result

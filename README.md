@@ -72,8 +72,8 @@ cipher.callback.value;
 // Default = 'AESCrypto'
 signatureAES
 
-// Get sha256 of file
-await fileChecksum(String path, {Hash algorithm = sha256});
+// Get file checksum sha256
+await getFileChecksum(String path, {Hash algorithm = sha256});
 
 // Get sha256 of string/bytes as string
 getTextChecksumString(dynamic value, {Hash algorithm = sha256});
