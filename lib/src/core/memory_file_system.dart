@@ -5,27 +5,28 @@ import 'dart:typed_data';
 
 class MemoryFileSystem extends RandomAccessFile {
   List<int> _dataBytes = [];
+  int _length = 0;
   int _position = 0;
   bool _isClosed = false;
 
   @override
-  Future<void> close() {
-    return Future(() {
-      return closeSync();
-    });
+  Future<void> close() async {
+    closeSync();
   }
 
   @override
   void closeSync() {
+    _accessibility();
+    _dataBytes.clear();
+    _length = 0;
+    _position = 0;
     _isClosed = true;
   }
 
   @override
-  Future<RandomAccessFile> flush() {
-    return Future(() {
-      flushSync();
-      return this;
-    });
+  Future<RandomAccessFile> flush() async {
+    flushSync();
+    return this;
   }
 
   @override
@@ -34,38 +35,39 @@ class MemoryFileSystem extends RandomAccessFile {
   }
 
   @override
-  Future<int> length() {
-    return Future(() {
-      return lengthSync();
-    });
+  Future<int> length() async {
+    return lengthSync();
   }
 
   @override
   int lengthSync() {
-    return _dataBytes.length;
+    _accessibility();
+    return _length;
   }
 
   @override
-  Future<RandomAccessFile> lock(
-      [FileLock mode = FileLock.exclusive, int start = 0, int end = -1]) {
-    return Future(() {
-      lockSync(mode, start, end);
-      return this;
-    });
+  Future<RandomAccessFile> lock([
+    FileLock mode = FileLock.exclusive,
+    int start = 0,
+    int end = -1,
+  ]) async {
+    lockSync(mode, start, end);
+    return this;
   }
 
   @override
-  void lockSync(
-      [FileLock mode = FileLock.exclusive, int start = 0, int end = -1]) {
+  void lockSync([
+    FileLock mode = FileLock.exclusive,
+    int start = 0,
+    int end = -1,
+  ]) {
     _accessibility();
   }
 
   @override
-  Future<RandomAccessFile> unlock([int start = 0, int end = -1]) {
-    return Future(() {
-      unlockSync(start, end);
-      return this;
-    });
+  Future<RandomAccessFile> unlock([int start = 0, int end = -1]) async {
+    unlockSync(start, end);
+    return this;
   }
 
   @override
@@ -77,23 +79,20 @@ class MemoryFileSystem extends RandomAccessFile {
   String get path => '';
 
   @override
-  Future<int> position() {
-    return Future(() {
-      return positionSync();
-    });
+  Future<int> position() async {
+    return positionSync();
   }
 
   @override
   int positionSync() {
+    _accessibility();
     return _position;
   }
 
   @override
-  Future<RandomAccessFile> setPosition(int position) {
-    return Future(() {
-      setPosition(position);
-      return this;
-    });
+  Future<RandomAccessFile> setPosition(int position) async {
+    setPositionSync(position);
+    return this;
   }
 
   @override
@@ -103,15 +102,15 @@ class MemoryFileSystem extends RandomAccessFile {
   }
 
   @override
-  Future<int> readByte() {
-    return Future(() {
-      return readByteSync();
-    });
+  Future<int> readByte() async {
+    return readByteSync();
   }
 
   @override
   int readByteSync() {
-    if (_position < _dataBytes.length) {
+    _accessibility();
+
+    if (_position < _length) {
       return _dataBytes[_position++];
     }
 
@@ -119,30 +118,28 @@ class MemoryFileSystem extends RandomAccessFile {
   }
 
   @override
-  Future<int> readInto(List<int> buffer, [int start = 0, int? end]) {
-    return Future(() {
-      return readIntoSync(buffer, start, end);
-    });
+  Future<int> readInto(List<int> buffer, [int start = 0, int? end]) async {
+    return readIntoSync(buffer, start, end);
   }
 
   @override
   int readIntoSync(List<int> buffer, [int start = 0, int? end]) {
+    _accessibility();
     throw UnimplementedError();
   }
 
   @override
-  Future<Uint8List> read(int count) {
-    return Future(() {
-      return readSync(count);
-    });
+  Future<Uint8List> read(int count) async {
+    return readSync(count);
   }
 
   @override
   Uint8List readSync(int count) {
-    int pos = min(_dataBytes.length, _position + count);
+    _accessibility();
     List<int> result = [];
 
-    if (_position < _dataBytes.length) {
+    if (_position < _length) {
+      final int pos = min(_length, _position + count);
       result = _dataBytes.getRange(_position, pos).toList();
       _position = pos;
     }
@@ -151,11 +148,9 @@ class MemoryFileSystem extends RandomAccessFile {
   }
 
   @override
-  Future<RandomAccessFile> truncate(int length) {
-    return Future(() {
-      truncateSync(length);
-      return this;
-    });
+  Future<RandomAccessFile> truncate(int length) async {
+    truncateSync(length);
+    return this;
   }
 
   @override
@@ -165,49 +160,52 @@ class MemoryFileSystem extends RandomAccessFile {
   }
 
   @override
-  Future<RandomAccessFile> writeByte(int value) {
-    return Future(() {
-      writeByteSync(value);
-      return this;
-    });
+  Future<RandomAccessFile> writeByte(int value) async {
+    writeByteSync(value);
+    return this;
   }
 
   @override
   int writeByteSync(int value) {
     _accessibility();
     _dataBytes.add(value);
+    _length++;
 
     return 1;
   }
 
   @override
-  Future<RandomAccessFile> writeFrom(List<int> buffer,
-      [int start = 0, int? end]) {
-    return Future(() {
-      writeFromSync(buffer, start, end);
-      return this;
-    });
+  Future<RandomAccessFile> writeFrom(
+    List<int> buffer, [
+    int start = 0,
+    int? end,
+  ]) async {
+    writeFromSync(buffer, start, end);
+    return this;
   }
 
   @override
   void writeFromSync(List<int> buffer, [int start = 0, int? end]) {
     _accessibility();
     _dataBytes += buffer;
+    _length += buffer.length;
   }
 
   @override
-  Future<RandomAccessFile> writeString(String string,
-      {Encoding encoding = utf8}) {
-    return Future(() {
-      writeStringSync(string, encoding: encoding);
-      return this;
-    });
+  Future<RandomAccessFile> writeString(
+    String string, {
+    Encoding encoding = utf8,
+  }) async {
+    writeStringSync(string, encoding: encoding);
+    return this;
   }
 
   @override
   void writeStringSync(String string, {Encoding encoding = utf8}) {
     _accessibility();
-    _dataBytes += utf8.encode(string);
+    final List<int> data = encoding.encode(string);
+    _dataBytes += data;
+    _length += data.length;
   }
 
   void _accessibility() {
