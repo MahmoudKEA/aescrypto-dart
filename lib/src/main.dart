@@ -8,16 +8,16 @@ import 'models.dart';
 import 'utils.dart';
 
 class AESCrypto {
+  AESCrypto({required String key, AESMode mode = AESMode.cbc}) {
+    _key = secureKey(key);
+    _mode = mode;
+  }
+
   late Uint8List _key;
   late AESMode _mode;
 
   late ProgressState state;
   late ProgressCallback callback;
-
-  AESCrypto({required String key, AESMode mode = AESMode.cbc}) {
-    _key = secureKey(key);
-    _mode = mode;
-  }
 
   void setKey(String key) {
     _key = secureKey(key);
@@ -196,10 +196,16 @@ class AESCrypto {
       srcFile,
       outputFile,
       hasKey,
+      false,
     );
 
-    // MemoryFileSystem still stores its data after closing it
-    // inside decryptFileCore
-    return await outputFile.read(await outputFile.length());
+    final Uint8List result = await outputFile.read(await outputFile.length());
+
+    print('data: $result');
+
+    await srcFile.close();
+    await outputFile.close();
+
+    return result;
   }
 }

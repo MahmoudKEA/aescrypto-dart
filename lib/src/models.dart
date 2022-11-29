@@ -4,5 +4,8 @@ class CipherModel {
   final Encrypter encrypter;
   final IV iv;
 
-  CipherModel(this.encrypter, this.iv);
+  CipherModel({
+    required this.encrypter,
+    required this.iv,
+  });
 }

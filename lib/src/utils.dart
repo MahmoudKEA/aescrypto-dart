@@ -8,6 +8,8 @@ import 'package:path/path.dart' as pathlib;
 
 import 'core/core.dart';
 
+// This signature by default is clean text and is not secure
+// Recommended to set the encrypted signature in your application
 Uint8List signatureAES = Uint8List.fromList(utf8.encode("AESCrypto"));
 
 Future<String> getFileChecksum(String path, {Hash algorithm = sha256}) async {

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:collection/collection.dart';
 
 import '../utils.dart';
 import 'core.dart';
@@ -25,14 +26,14 @@ IV metadataChecker(
   bool hasKey,
 ) {
   if (hasSignature) {
-    if (data.take(signatureAES.length).join() != signatureAES.join()) {
+    if (!data.take(signatureAES.length).toList().equals(signatureAES)) {
       throw Exception("signature doesn't match");
     }
     data.removeRange(0, signatureAES.length);
   }
 
   if (hasKey) {
-    if (data.take(keyLength).join() != secureKey(key).join()) {
+    if (!data.take(keyLength).toList().equals(secureKey(key))) {
       throw Exception("the key doesn't match");
     }
     data.removeRange(0, keyLength);

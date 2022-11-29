@@ -20,7 +20,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -33,7 +34,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -46,7 +48,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -59,7 +62,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -72,7 +76,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -85,7 +90,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -98,7 +104,8 @@ void main() {
       Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
       String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       """);
@@ -126,7 +133,8 @@ void main() {
       );
       String fileDecryptChecksum = await getFileChecksum(resultdecrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       resultdecrypt: $resultdecrypt
       fileDecryptChecksum: $fileDecryptChecksum
@@ -148,7 +156,8 @@ void main() {
       );
       String fileDecryptChecksum = getTextChecksumString(resultdecrypt);
 
-      printDebug("""
+      printDebug(
+          """
       resultEncrypt: $resultEncrypt
       fileDecryptChecksum: $fileDecryptChecksum
       """);

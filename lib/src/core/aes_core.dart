@@ -15,12 +15,10 @@ CipherModel getCipherModel(
 }) {
   iv ??= IV.fromSecureRandom(16);
 
-  final Encrypter cipher = Encrypter(AES(
-    Key(key),
-    mode: mode,
-    padding: padding,
-  ));
-  return CipherModel(cipher, iv);
+  final Encrypter cipher = Encrypter(
+    AES(Key(key), mode: mode, padding: padding),
+  );
+  return CipherModel(encrypter: cipher, iv: iv);
 }
 
 Future<void> encryptFileCore(
@@ -30,8 +28,9 @@ Future<void> encryptFileCore(
   ProgressCallback callback,
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
-  bool hasKey,
-) async {
+  bool hasKey, [
+  bool autoClose = true,
+]) async {
   final CipherModel cipher = getCipherModel(key, mode, padding: null);
 
   final int size = await srcFile.length();
@@ -46,7 +45,7 @@ Future<void> encryptFileCore(
       state.stop();
       continue;
     } else if (chunkLength % blockSize != 0) {
-      int padSize = blockSize - chunkLength % blockSize;
+      final int padSize = blockSize - chunkLength % blockSize;
       chunk = Uint8List.fromList(chunk + List.filled(padSize, padSize));
     }
 
@@ -57,8 +56,10 @@ Future<void> encryptFileCore(
     callback.update(chunkLength, size);
   }
 
-  await outputFile.close();
-  await srcFile.close();
+  if (autoClose) {
+    await outputFile.close();
+    await srcFile.close();
+  }
 
   // Delete the output file if the process is killed
   if (state.isKilled && outputFile.path.isNotEmpty) {
@@ -73,8 +74,9 @@ Future<void> decryptFileCore(
   ProgressCallback callback,
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
-  bool hasKey,
-) async {
+  bool hasKey, [
+  bool autoClose = true,
+]) async {
   final int size = sizeUnpacked(await srcFile.read(packedLength));
 
   final Uint8List metadata = await srcFile.read(
@@ -85,8 +87,8 @@ Future<void> decryptFileCore(
   final CipherModel cipher = getCipherModel(key, mode, iv: iv, padding: null);
 
   while (state.isRunning) {
-    Uint8List chunk = await srcFile.read(chunkSize);
-    int chunkLength = chunk.length;
+    final Uint8List chunk = await srcFile.read(chunkSize);
+    final int chunkLength = chunk.length;
 
     if (chunkLength == 0) {
       state.stop();
@@ -100,10 +102,14 @@ Future<void> decryptFileCore(
     callback.update(chunkLength, size);
   }
 
-  state.isCompleted ? await outputFile.truncate(size) : null;
+  if (state.isCompleted) {
+    await outputFile.truncate(size);
+  }
 
-  await outputFile.close();
-  await srcFile.close();
+  if (autoClose) {
+    await outputFile.close();
+    await srcFile.close();
+  }
 
   // Delete the output file if the process is killed
   if (state.isKilled && outputFile.path.isNotEmpty) {
