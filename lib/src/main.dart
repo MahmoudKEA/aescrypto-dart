@@ -201,8 +201,6 @@ class AESCrypto {
 
     final Uint8List result = await outputFile.read(await outputFile.length());
 
-    print('data: $result');
-
     await srcFile.close();
     await outputFile.close();
 
