@@ -55,7 +55,7 @@ Uint8List getTextChecksumBytes(dynamic value, {Hash algorithm = sha256}) {
 }
 
 Uint8List secureKey(dynamic key) {
-  final String key512 = getTextChecksumString(key, algorithm: sha256);
+  final String key512 = getTextChecksumString(key, algorithm: sha512);
   return getTextChecksumBytes(key512, algorithm: sha256);
 }
 
