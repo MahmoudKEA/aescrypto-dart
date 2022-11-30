@@ -28,14 +28,13 @@ Future<void> encryptFileCore(
   ProgressCallback callback,
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
-  bool hasKey, [
-  bool autoClose = true,
-]) async {
+  bool hasKey,
+) async {
   final CipherModel cipher = getCipherModel(key, mode, padding: null);
 
   final int size = await srcFile.length();
   await outputFile.writeFrom(sizePacked(size));
-  await outputFile.writeFrom(metadataBuilder(key, cipher.iv, true, hasKey));
+  await outputFile.writeFrom(dataBuilder(key, cipher.iv, true, hasKey));
 
   while (state.isRunning) {
     Uint8List chunk = await srcFile.read(chunkSize);
@@ -56,10 +55,8 @@ Future<void> encryptFileCore(
     callback.update(chunkLength, size);
   }
 
-  if (autoClose) {
-    await outputFile.close();
-    await srcFile.close();
-  }
+  await outputFile.close();
+  await srcFile.close();
 
   // Delete the output file if the process is killed
   if (state.isKilled && outputFile.path.isNotEmpty) {
@@ -74,15 +71,14 @@ Future<void> decryptFileCore(
   ProgressCallback callback,
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
-  bool hasKey, [
-  bool autoClose = true,
-]) async {
+  bool hasKey,
+) async {
   final int size = sizeUnpacked(await srcFile.read(packedLength));
 
   final Uint8List metadata = await srcFile.read(
     signatureAES.length + (hasKey ? keyLength : 0) + ivLength,
   );
-  final IV iv = metadataChecker(key, metadata.toList(), true, hasKey);
+  final IV iv = dataChecker(key, metadata.toList(), true, hasKey);
 
   final CipherModel cipher = getCipherModel(key, mode, iv: iv, padding: null);
 
@@ -106,10 +102,8 @@ Future<void> decryptFileCore(
     await outputFile.truncate(size);
   }
 
-  if (autoClose) {
-    await outputFile.close();
-    await srcFile.close();
-  }
+  await outputFile.close();
+  await srcFile.close();
 
   // Delete the output file if the process is killed
   if (state.isKilled && outputFile.path.isNotEmpty) {

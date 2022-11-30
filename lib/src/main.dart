@@ -33,16 +33,9 @@ class AESCrypto {
     bool hasKey = false,
   }) {
     final CipherModel cipher = getCipherModel(_key, _mode);
-    final Uint8List metadata = metadataBuilder(
-      _key,
-      cipher.iv,
-      hasSignature,
-      hasKey,
-    );
+    final Encrypted data = cipher.encrypter.encrypt(plainText, iv: cipher.iv);
 
-    return Uint8List.fromList(
-      metadata + cipher.encrypter.encrypt(plainText, iv: cipher.iv).bytes,
-    );
+    return dataBuilder(_key, cipher.iv, hasSignature, hasKey, data.bytes);
   }
 
   String decryptText({
@@ -52,7 +45,7 @@ class AESCrypto {
   }) {
     final List<int> data = bytes.toList();
 
-    final IV iv = metadataChecker(_key, data, hasSignature, hasKey);
+    final IV iv = dataChecker(_key, data, hasSignature, hasKey);
     final CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
 
     return cipher.encrypter.decrypt(
@@ -156,7 +149,7 @@ class AESCrypto {
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    final RandomAccessFile srcFile = MemoryFileSystem();
+    final MemoryFileSystem srcFile = MemoryFileSystem();
     await srcFile.writeFrom(data);
     final RandomAccessFile outputFile = await File(outputPath).open(
       mode: FileMode.writeOnly,
@@ -186,7 +179,9 @@ class AESCrypto {
     final RandomAccessFile srcFile = await File(path).open(
       mode: FileMode.read,
     );
-    final RandomAccessFile outputFile = MemoryFileSystem();
+    final MemoryFileSystem outputFile = MemoryFileSystem(
+      removeDataWhenClose: false,
+    );
 
     await decryptFileCore(
       _key,
@@ -196,13 +191,10 @@ class AESCrypto {
       srcFile,
       outputFile,
       hasKey,
-      false,
     );
 
     final Uint8List result = await outputFile.read(await outputFile.length());
-
-    await srcFile.close();
-    await outputFile.close();
+    await outputFile.forceClose();
 
     return result;
   }

@@ -6,20 +6,22 @@ import 'package:collection/collection.dart';
 import '../utils.dart';
 import 'core.dart';
 
-Uint8List metadataBuilder(
+Uint8List dataBuilder(
   Uint8List key,
   IV iv,
   bool hasSignature,
-  bool hasKey,
-) {
+  bool hasKey, [
+  Uint8List? data,
+]) {
   return Uint8List.fromList([
     if (hasSignature) ...signatureAES,
     if (hasKey) ...secureKey(key),
     ...iv.bytes,
+    if (data != null) ...data,
   ]);
 }
 
-IV metadataChecker(
+IV dataChecker(
   Uint8List key,
   List<int> data,
   bool hasSignature,
@@ -39,8 +41,8 @@ IV metadataChecker(
     data.removeRange(0, keyLength);
   }
 
-  final Uint8List iv = Uint8List.fromList(data.take(ivLength).toList());
+  final IV iv = IV(Uint8List.fromList(data.take(ivLength).toList()));
   data.removeRange(0, ivLength);
 
-  return IV(iv);
+  return iv;
 }
