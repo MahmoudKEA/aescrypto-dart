@@ -4,10 +4,28 @@ import 'dart:math';
 import 'dart:typed_data';
 
 class MemoryFileSystem extends RandomAccessFile {
+  MemoryFileSystem({
+    bool removeDataWhenClose = true,
+  }) {
+    _removeDataWhenClose = removeDataWhenClose;
+  }
+
   List<int> _dataBytes = [];
   int _length = 0;
   int _position = 0;
   bool _isClosed = false;
+  late bool _removeDataWhenClose;
+
+  Future<void> forceClose() async {
+    forceCloseSync();
+  }
+
+  void forceCloseSync() {
+    if (_isClosed) return;
+
+    _removeDataWhenClose = true;
+    closeSync();
+  }
 
   @override
   Future<void> close() async {
@@ -17,10 +35,13 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   void closeSync() {
     _accessibility();
-    _dataBytes.clear();
-    _length = 0;
-    _position = 0;
     _isClosed = true;
+
+    if (_removeDataWhenClose) {
+      _dataBytes.clear();
+      _length = 0;
+      _position = 0;
+    }
   }
 
   @override
@@ -41,7 +62,8 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   int lengthSync() {
-    _accessibility();
+    if (_removeDataWhenClose) _accessibility();
+
     return _length;
   }
 
@@ -85,7 +107,8 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   int positionSync() {
-    _accessibility();
+    if (_removeDataWhenClose) _accessibility();
+
     return _position;
   }
 
@@ -97,7 +120,8 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   void setPositionSync(int position) {
-    _accessibility();
+    if (_removeDataWhenClose) _accessibility();
+
     _position = position;
   }
 
@@ -108,7 +132,7 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   int readByteSync() {
-    _accessibility();
+    if (_removeDataWhenClose) _accessibility();
 
     if (_position < _length) {
       return _dataBytes[_position++];
@@ -124,7 +148,7 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   int readIntoSync(List<int> buffer, [int start = 0, int? end]) {
-    _accessibility();
+    if (_removeDataWhenClose) _accessibility();
     throw UnimplementedError();
   }
 
@@ -135,7 +159,8 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   Uint8List readSync(int count) {
-    _accessibility();
+    if (_removeDataWhenClose) _accessibility();
+
     List<int> result = [];
 
     if (_position < _length) {
