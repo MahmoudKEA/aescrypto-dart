@@ -32,7 +32,7 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) {
-    final CipherModel cipher = getCipherModel(_key, _mode);
+    final Cipher cipher = newCipher(_key, _mode);
     final Encrypted data = cipher.encrypter.encrypt(plainText, iv: cipher.iv);
 
     return dataBuilder(_key, cipher.iv, hasSignature, hasKey, data.bytes);
@@ -46,7 +46,7 @@ class AESCrypto {
     final List<int> data = bytes.toList();
 
     final IV iv = dataChecker(_key, data, hasSignature, hasKey);
-    final CipherModel cipher = getCipherModel(_key, _mode, iv: iv);
+    final Cipher cipher = newCipher(_key, _mode, iv: iv);
 
     return cipher.encrypter.decrypt(
       Encrypted(Uint8List.fromList(data)),

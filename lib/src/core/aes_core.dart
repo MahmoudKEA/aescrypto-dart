@@ -7,20 +7,6 @@ import '../models.dart';
 import '../utils.dart';
 import 'core.dart';
 
-CipherModel getCipherModel(
-  Uint8List key,
-  AESMode mode, {
-  IV? iv,
-  String? padding = 'PKCS7',
-}) {
-  iv ??= IV.fromSecureRandom(16);
-
-  final Encrypter cipher = Encrypter(
-    AES(Key(key), mode: mode, padding: padding),
-  );
-  return CipherModel(encrypter: cipher, iv: iv);
-}
-
 Future<void> encryptFileCore(
   Uint8List key,
   AESMode mode,
@@ -30,7 +16,7 @@ Future<void> encryptFileCore(
   RandomAccessFile outputFile,
   bool hasKey,
 ) async {
-  final CipherModel cipher = getCipherModel(key, mode, padding: null);
+  final Cipher cipher = newCipher(key, mode, padding: null);
 
   final int size = await srcFile.length();
   await outputFile.writeFrom(sizePacked(size));
@@ -80,7 +66,7 @@ Future<void> decryptFileCore(
   );
   final IV iv = dataChecker(key, metadata.toList(), true, hasKey);
 
-  final CipherModel cipher = getCipherModel(key, mode, iv: iv, padding: null);
+  final Cipher cipher = newCipher(key, mode, iv: iv, padding: null);
 
   while (state.isRunning) {
     final Uint8List chunk = await srcFile.read(chunkSize);

@@ -1,10 +1,10 @@
 import 'package:encrypt/encrypt.dart';
 
-class CipherModel {
+class Cipher {
   final Encrypter encrypter;
   final IV iv;
 
-  CipherModel({
+  Cipher({
     required this.encrypter,
     required this.iv,
   });
