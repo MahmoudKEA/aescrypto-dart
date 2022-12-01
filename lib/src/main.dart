@@ -27,31 +27,28 @@ class AESCrypto {
     _mode = mode;
   }
 
-  Uint8List encryptText({
+  Future<Uint8List> encryptText({
     required String plainText,
     bool hasSignature = false,
     bool hasKey = false,
-  }) {
+  }) async {
     final Cipher cipher = newCipher(_key, _mode);
-    final Encrypted data = cipher.encrypter.encrypt(plainText, iv: cipher.iv);
+    final Uint8List data = await encrypt<String>(cipher, plainText);
 
-    return dataBuilder(_key, cipher.iv, hasSignature, hasKey, data.bytes);
+    return dataBuilder(_key, cipher.iv, hasSignature, hasKey, data);
   }
 
-  String decryptText({
+  Future<String> decryptText({
     required Uint8List bytes,
     bool hasSignature = false,
     bool hasKey = false,
-  }) {
+  }) async {
     final List<int> data = bytes.toList();
 
     final IV iv = dataChecker(_key, data, hasSignature, hasKey);
     final Cipher cipher = newCipher(_key, _mode, iv: iv);
 
-    return cipher.encrypter.decrypt(
-      Encrypted(Uint8List.fromList(data)),
-      iv: cipher.iv,
-    );
+    return decrypt<String>(cipher, Uint8List.fromList(data));
   }
 
   Future<String> encryptFile({

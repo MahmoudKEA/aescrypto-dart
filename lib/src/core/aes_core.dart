@@ -35,7 +35,7 @@ Future<void> encryptFileCore(
     }
 
     await outputFile.writeFrom(
-      cipher.encrypter.encryptBytes(chunk.toList(), iv: cipher.iv).bytes,
+      await encrypt<Uint8List>(cipher, chunk),
     );
 
     callback.update(chunkLength, size);
@@ -78,7 +78,7 @@ Future<void> decryptFileCore(
     }
 
     await outputFile.writeFrom(
-      cipher.encrypter.decryptBytes(Encrypted(chunk), iv: cipher.iv),
+      await decrypt<List<int>>(cipher, chunk),
     );
 
     callback.update(chunkLength, size);

@@ -7,10 +7,10 @@ void main() async {
   AESCrypto cipher = AESCrypto(key: '123456789', mode: AESMode.cbc);
 
   // Encrypt text
-  Uint8List bytes = cipher.encryptText(plainText: 'plainText');
+  Uint8List bytes = await cipher.encryptText(plainText: 'plainText');
 
   // Decrypt text
-  String plainText = cipher.decryptText(bytes: bytes);
+  String plainText = await cipher.decryptText(bytes: bytes);
 
   // Encrypt a file
   String outputPathEnc = await cipher.encryptFile(

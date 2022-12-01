@@ -17,8 +17,8 @@ void main() {
     const String plainText = "plainText";
 
     test("Test (encryptText & decryptText) in default CBC mode", () async {
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
@@ -31,8 +31,8 @@ void main() {
 
     test("Test (encryptText & decryptText) in CFB64 mode", () async {
       cipher.setMode(AESMode.cfb64);
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
@@ -45,8 +45,8 @@ void main() {
 
     test("Test (encryptText & decryptText) in CTR mode", () async {
       cipher.setMode(AESMode.ctr);
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
@@ -59,8 +59,8 @@ void main() {
 
     test("Test (encryptText & decryptText) in ECB mode", () async {
       cipher.setMode(AESMode.ecb);
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
@@ -73,8 +73,8 @@ void main() {
 
     test("Test (encryptText & decryptText) in OFB64 mode", () async {
       cipher.setMode(AESMode.ofb64);
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
@@ -87,8 +87,8 @@ void main() {
 
     test("Test (encryptText & decryptText) in OFB64GCTR mode", () async {
       cipher.setMode(AESMode.ofb64Gctr);
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
@@ -101,8 +101,8 @@ void main() {
 
     test("Test (encryptText & decryptText) in SIC mode", () async {
       cipher.setMode(AESMode.sic);
-      Uint8List resultEncrypt = cipher.encryptText(plainText: plainText);
-      String resultdecrypt = cipher.decryptText(bytes: resultEncrypt);
+      Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
+      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
       printDebug(
           """
