@@ -144,8 +144,7 @@ class AESCrypto {
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    final MemoryFileSystem srcFile = MemoryFileSystem();
-    await srcFile.writeFrom(data);
+    final MemoryFileSystem srcFile = MemoryFileSystem(readOnlyData: data);
     final RandomAccessFile outputFile = await File(outputPath).open(
       mode: FileMode.writeOnly,
     );
