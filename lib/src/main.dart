@@ -35,7 +35,7 @@ class AESCrypto {
     final Cipher cipher = newCipher(_key, _mode);
     final Uint8List data = await encrypt<String>(cipher, plainText);
 
-    return dataBuilder(_key, cipher.iv, hasSignature, hasKey, data);
+    return dataEncoder(_key, cipher.iv, hasSignature, hasKey, data);
   }
 
   Future<String> decryptText({
@@ -43,12 +43,10 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) async {
-    final List<int> data = bytes.toList();
+    final DataDecoder data = dataDeocder(_key, bytes, hasSignature, hasKey);
+    final Cipher cipher = newCipher(_key, _mode, iv: data.iv);
 
-    final IV iv = dataChecker(_key, data, hasSignature, hasKey);
-    final Cipher cipher = newCipher(_key, _mode, iv: iv);
-
-    return decrypt<String>(cipher, Uint8List.fromList(data));
+    return decrypt<String>(cipher, Uint8List.fromList(data.data));
   }
 
   Future<String> encryptFile({

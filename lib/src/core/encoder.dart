@@ -6,7 +6,14 @@ import 'package:collection/collection.dart';
 import '../utils.dart';
 import 'core.dart';
 
-Uint8List dataBuilder(
+class DataDecoder {
+  DataDecoder(this.data, this.iv);
+
+  final List<int> data;
+  final IV iv;
+}
+
+Uint8List dataEncoder(
   Uint8List key,
   IV iv,
   bool hasSignature,
@@ -21,12 +28,14 @@ Uint8List dataBuilder(
   ]);
 }
 
-IV dataChecker(
+DataDecoder dataDeocder(
   Uint8List key,
-  List<int> data,
+  Uint8List bytes,
   bool hasSignature,
   bool hasKey,
 ) {
+  final List<int> data = bytes.toList();
+
   if (hasSignature) {
     if (!data.take(signatureAES.length).toList().equals(signatureAES)) {
       throw Exception("signature doesn't match");
@@ -44,5 +53,5 @@ IV dataChecker(
   final IV iv = IV(Uint8List.fromList(data.take(ivLength).toList()));
   data.removeRange(0, ivLength);
 
-  return iv;
+  return DataDecoder(data, iv);
 }

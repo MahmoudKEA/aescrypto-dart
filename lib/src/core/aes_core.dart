@@ -20,7 +20,7 @@ Future<void> encryptFileCore(
 
   final int size = await srcFile.length();
   await outputFile.writeFrom(sizePacked(size));
-  await outputFile.writeFrom(dataBuilder(key, cipher.iv, true, hasKey));
+  await outputFile.writeFrom(dataEncoder(key, cipher.iv, true, hasKey));
 
   while (state.isRunning) {
     Uint8List chunk = await srcFile.read(chunkSize);
@@ -64,9 +64,9 @@ Future<void> decryptFileCore(
   final Uint8List metadata = await srcFile.read(
     signatureAES.length + (hasKey ? keyLength : 0) + ivLength,
   );
-  final IV iv = dataChecker(key, metadata.toList(), true, hasKey);
+  final DataDecoder dataDecoded = dataDeocder(key, metadata, true, hasKey);
 
-  final Cipher cipher = newCipher(key, mode, iv: iv, padding: null);
+  final Cipher cipher = newCipher(key, mode, iv: dataDecoded.iv, padding: null);
 
   while (state.isRunning) {
     final Uint8List chunk = await srcFile.read(chunkSize);
