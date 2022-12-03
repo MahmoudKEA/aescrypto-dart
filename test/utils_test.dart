@@ -13,7 +13,7 @@ void printDebug(String message) {
 
 void main() {
   const String plainText = "plainText";
-  final Uint8List textBytes = Uint8List.fromList(utf8.encode("plainText"));
+  final Uint8List textBytes = utf8.encoder.convert("plainText");
 
   group("Checksum Group:", () {
     const String path = './test/data.txt';
@@ -86,8 +86,7 @@ void main() {
       String resultByString = getTextChecksumString(plainText);
       String resultByBytes = getTextChecksumString(textBytes);
 
-      printDebug(
-          """
+      printDebug("""
       resultByString: $resultByString
       resultByBytes: $resultByBytes
       """);
@@ -100,8 +99,7 @@ void main() {
       Uint8List resultByString = getTextChecksumBytes(plainText);
       Uint8List resultByBytes = getTextChecksumBytes(textBytes);
 
-      printDebug(
-          """
+      printDebug("""
       resultByString: $resultByString
       resultByBytes: $resultByBytes
       """);
@@ -164,8 +162,7 @@ void main() {
       String resultWithExtension = addAESExtension(path);
       String resultWithoutExtension = removeAESExtension(resultWithExtension);
 
-      printDebug(
-          """
+      printDebug("""
       resultWithExtension: $resultWithExtension
       resultWithoutExtension: $resultWithoutExtension
       """);

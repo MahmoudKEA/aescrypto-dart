@@ -10,7 +10,7 @@ import 'core/core.dart';
 
 // This signature by default is clean text and is not secure
 // Recommended to set the encrypted signature in your application
-Uint8List signatureAES = Uint8List.fromList(utf8.encode("AESCrypto"));
+Uint8List signatureAES = utf8.encoder.convert("AESCrypto");
 
 Future<String> getFileChecksum(String path, {Hash algorithm = sha256}) async {
   final RandomAccessFile srcFile = await File(path).open(mode: FileMode.read);
@@ -34,7 +34,7 @@ Future<String> getFileChecksum(String path, {Hash algorithm = sha256}) async {
 
 String getTextChecksumString(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
-    value = utf8.encode(value);
+    value = utf8.encoder.convert(value);
   } else if (value is! List<int>) {
     throw Exception(
       "Value must be String or List<int>, got ${value.runtimeType}",
@@ -46,7 +46,7 @@ String getTextChecksumString(dynamic value, {Hash algorithm = sha256}) {
 
 Uint8List getTextChecksumBytes(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
-    value = utf8.encode(value);
+    value = utf8.encoder.convert(value);
   } else if (value is! List<int>) {
     throw Exception(
       "Value must be String or List<int>, got ${value.runtimeType}",
