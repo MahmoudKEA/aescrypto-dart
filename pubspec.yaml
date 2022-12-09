@@ -18,8 +18,8 @@ environment:
 dependencies: 
   convert: ^3.1.1
   crypto: ^3.0.2
-  path: ^1.8.3
-  collection: ^1.17.0
+  path: ^1.8.2
+  collection: ^1.16.0
   encrypt:
     git:
       url: https://github.com/MahmoudKhalid/encrypt.git
