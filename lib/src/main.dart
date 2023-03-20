@@ -43,7 +43,7 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) async {
-    final DataDecoder data = dataDeocder(_key, bytes, hasSignature, hasKey);
+    final DataDecoder data = dataDecoder(_key, bytes, hasSignature, hasKey);
     final Cipher cipher = newCipher(_key, _mode, iv: data.iv);
 
     return decrypt<String>(cipher, Uint8List.fromList(data.data));

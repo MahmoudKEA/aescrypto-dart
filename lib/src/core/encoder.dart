@@ -28,7 +28,7 @@ Uint8List dataEncoder(
   ]);
 }
 
-DataDecoder dataDeocder(
+DataDecoder dataDecoder(
   Uint8List key,
   Uint8List bytes,
   bool hasSignature,

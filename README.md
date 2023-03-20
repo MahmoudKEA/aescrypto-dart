@@ -29,7 +29,7 @@ String plainText = cipher.decryptText(bytes: bytes);
 // Encrypt a file
 String outputPathEnc = await cipher.encryptFile(
     path: 'path/to/file.txt', // target file (Required)
-    directory: 'output/folder', // putput dir (Default at same srcDir)
+    directory: 'output/folder', // output dir (Default at same srcDir)
     hasKey: true, // include hash key into the file to check when decrypting
     ignoreFileExists: true, // warns or overwrite if file already exists
     removeAfterComplete: true, // remove source file when complete

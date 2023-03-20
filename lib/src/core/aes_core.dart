@@ -64,7 +64,7 @@ Future<void> decryptFileCore(
   final Uint8List metadata = await srcFile.read(
     signatureAES.length + (hasKey ? keyLength : 0) + ivLength,
   );
-  final DataDecoder dataDecoded = dataDeocder(key, metadata, true, hasKey);
+  final DataDecoder dataDecoded = dataDecoder(key, metadata, true, hasKey);
 
   final Cipher cipher = newCipher(key, mode, iv: dataDecoded.iv, padding: null);
 

@@ -1,5 +1,5 @@
 export 'constants.dart';
-export 'sizepack.dart';
+export 'size_pack.dart';
 export 'path_handler.dart';
 export 'encoder.dart';
 export 'progress_callback.dart';
