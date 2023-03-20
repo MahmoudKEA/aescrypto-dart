@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:path/path.dart' as pathlib;
 
 import '../utils.dart';
-import 'core.dart';
 
 Future<void> fileExistsChecker(String path, bool ignoreFileExists) async {
   if (!ignoreFileExists && await File(path).exists()) {
@@ -11,13 +10,15 @@ Future<void> fileExistsChecker(String path, bool ignoreFileExists) async {
   }
 }
 
-Future<String> outputPathHandler(String path, {String? directory}) async {
-  if (directory is String) {
+Future<String> outputPathHandler(
+  String path, {
+  String? directory,
+  required bool forEncrypt,
+}) async {
+  if (directory != null) {
     await Directory(directory).create(recursive: true);
     path = pathlib.join(directory, pathlib.basename(path));
   }
 
-  return path.endsWith(outputFileExtension)
-      ? removeAESExtension(path)
-      : addAESExtension(path);
+  return forEncrypt ? addAESExtension(path) : removeAESExtension(path);
 }

@@ -60,6 +60,7 @@ class AESCrypto {
     final String outputPath = await outputPathHandler(
       path,
       directory: directory,
+      forEncrypt: true,
     );
     await fileExistsChecker(outputPath, ignoreFileExists);
 
@@ -101,6 +102,7 @@ class AESCrypto {
     final String outputPath = await outputPathHandler(
       path,
       directory: directory,
+      forEncrypt: false,
     );
     await fileExistsChecker(outputPath, ignoreFileExists);
 
@@ -138,7 +140,7 @@ class AESCrypto {
     bool ignoreFileExists = false,
     void Function(int value)? progressCallback,
   }) async {
-    final String outputPath = await outputPathHandler(path);
+    final String outputPath = await outputPathHandler(path, forEncrypt: true);
     await fileExistsChecker(outputPath, ignoreFileExists);
 
     state = ProgressState();
