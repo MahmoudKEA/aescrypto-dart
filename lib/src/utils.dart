@@ -4,12 +4,11 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
-import 'package:path/path.dart' as pathlib;
 
 import 'core/core.dart';
 
-// This signature by default is clean text and is not secure
-// Recommended to set the encrypted signature in your application
+/// This signature by default is clean text and it's not secure,
+/// Recommended to set the encrypted signature in your application
 Uint8List signatureAES = utf8.encoder.convert("AESCrypto");
 
 Future<String> getFileChecksum(String path, {Hash algorithm = sha256}) async {
@@ -62,13 +61,13 @@ Uint8List secureKey(dynamic key) {
 }
 
 String addAESExtension(String path) {
-  return pathlib.prettyUri(path + outputFileExtension);
+  return Uri.file(path + outputFileExtension).toFilePath();
 }
 
 String removeAESExtension(String path) {
-  return pathlib.prettyUri(
+  return Uri.file(
     path.endsWith(outputFileExtension)
         ? path.substring(0, path.length - outputFileExtension.length)
         : path,
-  );
+  ).toFilePath();
 }

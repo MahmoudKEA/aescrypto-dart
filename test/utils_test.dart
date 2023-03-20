@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:aescrypto/aescrypto.dart';
 import 'package:crypto/crypto.dart';
 import 'package:test/test.dart';
-import 'package:path/path.dart' as pathlib;
 
 const debugging = true;
 void printDebug(String message) {
@@ -156,7 +155,7 @@ void main() {
   });
 
   group("Path Group:", () {
-    String path = pathlib.prettyUri('./test/data.txt');
+    String path = Uri.file('./test/data.txt').toFilePath();
 
     test("Test (addAESExtension & removeAESExtension)", () {
       String resultWithExtension = addAESExtension(path);
