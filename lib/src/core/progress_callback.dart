@@ -9,7 +9,7 @@ class ProgressState {
   bool get isCompleted => _isCompleted;
   bool get isKilled => _isKilled;
 
-  void stop() {
+  void done() {
     _isRunning = false;
     _isCompleted = true;
   }
