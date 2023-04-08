@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 import 'package:collection/collection.dart';
 
+import '../errors.dart';
 import '../utils.dart';
 import 'core.dart';
 
@@ -38,14 +39,14 @@ DataDecoder dataDecoder(
 
   if (hasSignature) {
     if (!data.take(signatureAES.length).toList().equals(signatureAES)) {
-      throw Exception("signature doesn't match");
+      throw UnsupportedError("signature doesn't match");
     }
     data.removeRange(0, signatureAES.length);
   }
 
   if (hasKey) {
     if (!data.take(keyLength).toList().equals(secureKey(key))) {
-      throw Exception("the key doesn't match");
+      throw InvalidKeyError("the key doesn't match");
     }
     data.removeRange(0, keyLength);
   }

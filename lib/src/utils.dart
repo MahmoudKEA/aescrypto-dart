@@ -6,6 +6,7 @@ import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
 import 'core/core.dart';
+import 'errors.dart';
 
 /// This signature by default is clean text and it's not secure,
 /// Recommended to set the encrypted signature in your application
@@ -35,7 +36,7 @@ String getTextChecksumString(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
     value = utf8.encoder.convert(value);
   } else if (value is! List<int>) {
-    throw Exception(
+    throw ValueTypeError(
       "Value must be String or List<int>, got ${value.runtimeType}",
     );
   }
@@ -47,7 +48,7 @@ Uint8List getTextChecksumBytes(dynamic value, {Hash algorithm = sha256}) {
   if (value is String) {
     value = utf8.encoder.convert(value);
   } else if (value is! List<int>) {
-    throw Exception(
+    throw ValueTypeError(
       "Value must be String or List<int>, got ${value.runtimeType}",
     );
   }
