@@ -170,4 +170,98 @@ void main() {
       expect(resultWithoutExtension, equals(path));
     });
   });
+
+  group("SecretStringStorage Group:", () {
+    SecretStringStorage storage = SecretStringStorage.instance;
+
+    String key1 = '123';
+    String key2 = '12345';
+    String key3 = '1234567';
+    String key4 = '123456789';
+
+    test("Test (readAll) before store data", () {
+      Map<String, String>? readAll = storage.readAll();
+
+      printDebug("""
+      readAll: $readAll
+      """);
+
+      expect(readAll, isNull);
+    });
+
+    test("Test (read & write)", () {
+      storage.write(key: 'key1', value: key1);
+      storage.write(key: 'key2', value: key2);
+      storage.write(key: 'key3', value: key3);
+      storage.write(key: 'key4', value: key4);
+
+      String? readKey1 = storage.read('key1');
+      String? readKey2 = storage.read('key2');
+      String? readKey3 = storage.read('key3');
+      String? readKey4 = storage.read('key4');
+      String? readKey5 = storage.read('key5');
+
+      printDebug("""
+      readKey1: $readKey1
+      readKey2: $readKey2
+      readKey3: $readKey3
+      readKey4: $readKey4
+      readKey5: $readKey5
+      """);
+
+      expect(readKey1, equals(key1));
+      expect(readKey2, equals(key2));
+      expect(readKey3, equals(key3));
+      expect(readKey4, equals(key4));
+      expect(readKey5, isNull);
+    });
+
+    test("Test (readAll) after data stored", () {
+      Map<String, String>? readAll = storage.readAll();
+
+      printDebug("""
+      readAll: $readAll
+      """);
+
+      expect(readAll?.length, equals(4));
+    });
+
+    test("Test (remove)", () {
+      bool removeKey4 = storage.remove('key4');
+      bool removeKey5 = storage.remove('key5');
+
+      String? readKey4 = storage.read('key4');
+      String? readKey5 = storage.read('key5');
+
+      printDebug("""
+      removeKey4: $removeKey4
+      removeKey5: $removeKey5
+      readKey4: $readKey4
+      readKey5: $readKey5
+      """);
+
+      expect(removeKey4, isTrue);
+      expect(removeKey5, isFalse);
+      expect(readKey4, isNull);
+      expect(readKey5, isNull);
+    });
+
+    test("Test (clear)", () {
+      storage.clear();
+
+      String? readKey1 = storage.read('key1');
+      String? readKey2 = storage.read('key2');
+      String? readKey3 = storage.read('key3');
+
+      printDebug("""
+      readKey1: $readKey1
+      readKey2: $readKey2
+      readKey3: $readKey3
+      """);
+
+      expect(readKey1, isNull);
+      expect(readKey2, isNull);
+      expect(readKey3, isNull);
+    });
+  });
 }
