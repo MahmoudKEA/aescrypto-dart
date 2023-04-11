@@ -89,4 +89,16 @@ addAESExtension(String path);
 
 // Path without AES extension
 removeAESExtension(String path);
+
+// SecretStringStorage
+// Add key
+SecretStringStorage.instance.write(key: 'key', value: 'value');
+// Read key
+SecretStringStorage.instance.read('key');
+// Read all keys
+SecretStringStorage.instance.readAll();
+// Remove key
+SecretStringStorage.instance.remove('key');
+// Remove all keys
+SecretStringStorage.instance.clear();
 ```
