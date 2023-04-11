@@ -9,18 +9,21 @@ import 'utils.dart';
 
 class AESCrypto {
   AESCrypto({required String key, AESMode mode = AESMode.cbc}) {
-    _key = secureKey(key);
+    _storage = SecretStringStorage();
     _mode = mode;
+    setKey(key);
   }
 
-  late Uint8List _key;
+  late SecretStringStorage _storage;
   late AESMode _mode;
 
   late ProgressState state;
   late ProgressCallback callback;
 
+  Uint8List get _key => secureKey(_storage.read('key')!);
+
   void setKey(String key) {
-    _key = secureKey(key);
+    _storage.write(key: 'key', value: key, overwrite: true);
   }
 
   void setMode(AESMode mode) {
@@ -32,10 +35,11 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) async {
-    final Cipher cipher = newCipher(_key, _mode);
+    final Uint8List key = _key;
+    final Cipher cipher = newCipher(key, _mode);
     final Uint8List data = await encrypt<String>(cipher, plainText);
 
-    return dataEncoder(_key, cipher.iv, hasSignature, hasKey, data);
+    return dataEncoder(key, cipher.iv, hasSignature, hasKey, data);
   }
 
   Future<String> decryptText({
@@ -43,8 +47,9 @@ class AESCrypto {
     bool hasSignature = false,
     bool hasKey = false,
   }) async {
-    final DataDecoder data = dataDecoder(_key, bytes, hasSignature, hasKey);
-    final Cipher cipher = newCipher(_key, _mode, iv: data.iv);
+    final Uint8List key = _key;
+    final DataDecoder data = dataDecoder(key, bytes, hasSignature, hasKey);
+    final Cipher cipher = newCipher(key, _mode, iv: data.iv);
 
     return decrypt<String>(cipher, Uint8List.fromList(data.data));
   }
