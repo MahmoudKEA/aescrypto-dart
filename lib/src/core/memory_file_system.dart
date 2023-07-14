@@ -3,35 +3,25 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-class MemoryFileSystem extends RandomAccessFile {
-  MemoryFileSystem({
-    Uint8List? readOnlyData,
-    bool removeDataWhenClose = true,
-  }) {
-    _readableData = readOnlyData;
-    _removeDataWhenClose = removeDataWhenClose;
-    _length = readOnlyData?.length ?? 0;
-  }
+enum MemoryFileSystemMode { readOnly, writeOnly, readAndWrite }
 
-  late Uint8List? _readableData;
-  List<int> _writableData = [];
+class MemoryFileSystem implements RandomAccessFile {
+  final MemoryFileSystemMode mode;
+  late List<int> _bytes;
   int _length = 0;
   int _position = 0;
   bool _isClosed = false;
-  late bool _removeDataWhenClose;
 
-  bool get isReadOnly => _readableData != null;
-
-  Future<void> forceClose() async {
-    forceCloseSync();
+  MemoryFileSystem({
+    Uint8List? bytes,
+    this.mode = MemoryFileSystemMode.writeOnly,
+  }) {
+    _bytes = bytes ?? [];
+    _length = bytes?.length ?? 0;
   }
 
-  void forceCloseSync() {
-    if (_isClosed) return;
-
-    _removeDataWhenClose = true;
-    closeSync();
-  }
+  @override
+  String get path => '';
 
   @override
   Future<void> close() async {
@@ -41,14 +31,10 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   void closeSync() {
     _accessibility();
+    _bytes = [];
+    _length = 0;
+    _position = 0;
     _isClosed = true;
-
-    if (_removeDataWhenClose) {
-      _readableData = isReadOnly ? Uint8List(0) : null;
-      _writableData.clear();
-      _length = 0;
-      _position = 0;
-    }
   }
 
   @override
@@ -71,7 +57,6 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   int lengthSync() {
     _accessibility();
-
     return _length;
   }
 
@@ -108,9 +93,6 @@ class MemoryFileSystem extends RandomAccessFile {
   }
 
   @override
-  String get path => '';
-
-  @override
   Future<int> position() async {
     return positionSync();
   }
@@ -130,6 +112,11 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   void setPositionSync(int position) {
     _accessibility();
+
+    if (position > _length) {
+      throw Exception("The position exceeds the length of the data");
+    }
+
     _position = position;
   }
 
@@ -140,10 +127,10 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   int readByteSync() {
-    _accessibility();
+    _accessibility(writable: false);
 
     if (_position < _length) {
-      return (_readableData ?? _writableData)[_position++];
+      return _bytes[_position++];
     }
 
     return -1;
@@ -156,7 +143,7 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   int readIntoSync(List<int> buffer, [int start = 0, int? end]) {
-    _accessibility();
+    _accessibility(writable: false);
     throw UnimplementedError();
   }
 
@@ -167,13 +154,13 @@ class MemoryFileSystem extends RandomAccessFile {
 
   @override
   Uint8List readSync(int count) {
-    _accessibility();
+    _accessibility(writable: false);
 
     Iterable<int> result = [];
 
     if (_position < _length) {
       final int pos = min(_length, _position + count);
-      result = (_readableData ?? _writableData).getRange(_position, pos);
+      result = _bytes.getRange(_position, pos);
       _position = pos;
     }
 
@@ -189,8 +176,8 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   void truncateSync(int length) {
     _accessibility(writable: true);
-    _writableData = _writableData.take(length).toList();
-    _length = length;
+    _bytes.removeRange(length, _length);
+    _length = _bytes.length;
   }
 
   @override
@@ -202,7 +189,7 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   int writeByteSync(int value) {
     _accessibility(writable: true);
-    _writableData.add(value);
+    _bytes.add(value);
     _length++;
 
     return 1;
@@ -221,7 +208,7 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   void writeFromSync(List<int> buffer, [int start = 0, int? end]) {
     _accessibility(writable: true);
-    _writableData += buffer;
+    _bytes += buffer;
     _length += buffer.length;
   }
 
@@ -237,18 +224,22 @@ class MemoryFileSystem extends RandomAccessFile {
   @override
   void writeStringSync(String string, {Encoding encoding = utf8}) {
     _accessibility(writable: true);
-    final List<int> data = encoding.encode(string);
-    _writableData += data;
-    _length += data.length;
+    final List<int> bytes = encoding.encode(string);
+    _bytes += bytes;
+    _length += bytes.length;
   }
 
-  void _accessibility({bool writable = false}) {
-    if (writable && isReadOnly) {
-      throw Exception("Permission denied, memory is read-only");
+  void _accessibility({bool? writable}) {
+    if (writable != null) {
+      if (!writable && mode == MemoryFileSystemMode.writeOnly) {
+        throw Exception("Permission denied, memory file in write-only mode");
+      } else if (writable && mode == MemoryFileSystemMode.readOnly) {
+        throw Exception("Permission denied, memory file in read-only mode");
+      }
     }
 
-    if (_isClosed && (writable || _removeDataWhenClose)) {
-      throw Exception("Unable to access, file is closed");
+    if (_isClosed) {
+      throw Exception("Unable to access, memory file is closed");
     }
   }
 }
