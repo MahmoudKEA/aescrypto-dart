@@ -18,99 +18,92 @@ void main() {
 
     test("Test (encryptText & decryptText) in default CBC mode", () async {
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
 
     test("Test (encryptText & decryptText) in CFB64 mode", () async {
       cipher.setMode(AESMode.cfb64);
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
 
     test("Test (encryptText & decryptText) in CTR mode", () async {
       cipher.setMode(AESMode.ctr);
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
 
     test("Test (encryptText & decryptText) in ECB mode", () async {
       cipher.setMode(AESMode.ecb);
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
 
     test("Test (encryptText & decryptText) in OFB64 mode", () async {
       cipher.setMode(AESMode.ofb64);
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
 
     test("Test (encryptText & decryptText) in OFB64GCTR mode", () async {
       cipher.setMode(AESMode.ofb64Gctr);
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
 
     test("Test (encryptText & decryptText) in SIC mode", () async {
       cipher.setMode(AESMode.sic);
       Uint8List resultEncrypt = await cipher.encryptText(plainText: plainText);
-      String resultdecrypt = await cipher.decryptText(bytes: resultEncrypt);
+      String resultDecrypt = await cipher.decryptText(bytes: resultEncrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       """);
 
-      expect(resultdecrypt, equals(plainText));
+      expect(resultDecrypt, equals(plainText));
     });
   });
 
@@ -126,17 +119,16 @@ void main() {
         ignoreFileExists: true,
         progressCallback: (value) => printDebug('Encrypt progress: $value'),
       );
-      String resultdecrypt = await cipher.decryptFile(
+      String resultDecrypt = await cipher.decryptFile(
         path: resultEncrypt,
         ignoreFileExists: true,
         progressCallback: (value) => printDebug('Decrypt progress: $value'),
       );
-      String fileDecryptChecksum = await getFileChecksum(resultdecrypt);
+      String fileDecryptChecksum = await getFileChecksum(resultDecrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
-      resultdecrypt: $resultdecrypt
+      resultDecrypt: $resultDecrypt
       fileDecryptChecksum: $fileDecryptChecksum
       """);
 
@@ -150,19 +142,18 @@ void main() {
         ignoreFileExists: true,
         progressCallback: (value) => printDebug('Encrypt progress: $value'),
       );
-      Uint8List resultdecrypt = await cipher.decryptFromFile(
+      Uint8List resultDecrypt = await cipher.decryptFromFile(
         path: resultEncrypt,
         progressCallback: (value) => printDebug('Decrypt progress: $value'),
       );
-      String fileDecryptChecksum = getTextChecksumString(resultdecrypt);
+      String fileDecryptChecksum = getTextChecksumString(resultDecrypt);
 
-      printDebug(
-          """
+      printDebug("""
       resultEncrypt: $resultEncrypt
       fileDecryptChecksum: $fileDecryptChecksum
       """);
 
-      expect(resultdecrypt, equals(data));
+      expect(resultDecrypt, equals(data));
       expect(checksum, equals(fileDecryptChecksum));
     });
   });
