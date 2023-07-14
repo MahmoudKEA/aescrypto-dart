@@ -62,8 +62,9 @@ Future<void> decryptFileCore(
   ProgressCallback callback,
   RandomAccessFile srcFile,
   RandomAccessFile outputFile,
-  bool hasKey,
-) async {
+  bool hasKey, {
+  void Function(Uint8List bytes)? onOutputCallback,
+}) async {
   try {
     final int size = sizeUnpacked(await srcFile.read(packedLength));
 
@@ -97,6 +98,7 @@ Future<void> decryptFileCore(
 
     if (state.isCompleted) {
       await outputFile.truncate(size);
+      onOutputCallback?.call(await outputFile.read(await outputFile.length()));
     }
   } catch (_) {
     rethrow;

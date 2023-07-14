@@ -151,7 +151,10 @@ class AESCrypto {
     state = ProgressState();
     callback = ProgressCallback(progressCallback);
 
-    final MemoryFileSystem srcFile = MemoryFileSystem(readOnlyData: data);
+    final MemoryFileSystem srcFile = MemoryFileSystem(
+      bytes: data,
+      mode: MemoryFileSystemMode.readOnly,
+    );
     final RandomAccessFile outputFile = await File(outputPath).open(
       mode: FileMode.writeOnly,
     );
@@ -181,8 +184,9 @@ class AESCrypto {
       mode: FileMode.read,
     );
     final MemoryFileSystem outputFile = MemoryFileSystem(
-      removeDataWhenClose: false,
+      mode: MemoryFileSystemMode.readAndWrite,
     );
+    Uint8List outputBytes = Uint8List(0);
 
     await decryptFileCore(
       _key,
@@ -192,11 +196,9 @@ class AESCrypto {
       srcFile,
       outputFile,
       hasKey,
+      onOutputCallback: (bytes) => outputBytes = bytes,
     );
 
-    final Uint8List result = await outputFile.read(await outputFile.length());
-    await outputFile.forceClose();
-
-    return result;
+    return outputBytes;
   }
 }
