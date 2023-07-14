@@ -1,3 +1,4 @@
-## 2.0.0
+## 2.5.1
 
-- Initial version.
+- MemoryFileSystem Upgrade.
+- Upgrade to dart 3
